@@ -52,16 +52,16 @@ conflictResult = gitProject.conflictScenario(commitHash) #aqui vamos pegar o par
 gitProject.deleteProject()
 
 #TIRAR ESSE#if conflictResult[0] #se existir 2 parents
-if conflictResult[0]
+if true
   conflictParents = conflictResult[1] #conflictParents = parentMerge
   #ESTRUTURA [PAI1,PAI2,FILHO]
   travisLog = gitProject.getTravisLog(commitHash)#pegar a log do nosso commit
 
   unimplementedMethodExtractor = UnimplementedMethodExtractor.new()
   unavailableResult = unimplementedMethodExtractor.extractionFilesInfo(travisLog)
+  puts "unavailableResult = \n" << unavailableResult
 
-
-  if unavailableResult[0] == "UnimplementedMethodVariable"
+  if unavailableResult[0] == "UnimplementedMethod"
     conflictCauses = unavailableResult[1]
     ocurrences = unavailableResult[2]
 
