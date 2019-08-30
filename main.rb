@@ -57,8 +57,8 @@ if conflictResult[0]
   #ESTRUTURA [PAI1,PAI2,FILHO]
   travisLog = gitProject.getTravisLog(commitHash)#pegar a log do nosso commit
 
-  UnimplementedMethodExtractor = UnimplementedMethodExtractor.new()
-  unavailableResult = UnimplementedMethodExtractor.extractionFilesInfo(travisLog)
+  unimplementedMethodExtractor = UnimplementedMethodExtractor.new()
+  unavailableResult = unimplementedMethodExtractor.extractionFilesInfo(travisLog)
 
 
   if unavailableResult[0] == "UnimplementedMethodVariable"
