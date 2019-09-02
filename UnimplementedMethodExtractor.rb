@@ -40,10 +40,13 @@ class UnimplementedMethodExtractor
 		while(count < interfaceFiles.size)
 			classFile = ""
 			methodInterface = ""
+			filePath = ""
 			if (buildLog.match(/\[ERROR\] [0-9a-zA-Z\/\-]*\.java/).to_s.match(/[a-zA-Z]+\.java/)[0].to_s)
+				filePath = buildLog.match(/\[ERROR\] [0-9a-zA-Z\/\-]*\.java/).to_s.gsub(/\[ERROR\] /)
 				classFile = classFiles[count].to_s.match(/[a-zA-Z]+\.java/)[0].to_s.gsub(".java", "")
 			elsif (buildLog.match(/error: [0-9a-zA-Z\/\-]* is not abstract/))
 				classFile = classFiles[count].to_s.match(/error: [a-zA-Z\/\-]*/).gsub("error: ","").to_s.gsub(".java", "")
+				filePath = buildLog.match(/error [0-9a-zA-Z\/\-]*\.java/).to_s.gsub(/error /)
 			end
 			interfaceFile = interfaceFiles[count].to_s.split(".").last.gsub("\r", "").to_s
 			if (methodInterfaces[count].to_s.match(/does not override abstract method[\s\S]*\(/))

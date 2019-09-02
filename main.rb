@@ -59,17 +59,16 @@ if true
 
   unimplementedMethodExtractor = UnimplementedMethodExtractor.new()
   unavailableResult = unimplementedMethodExtractor.extractionFilesInfo(travisLog)
-  puts "unavailableResult = \n" << unavailableResult
+  puts "unavailableResult = \n" << unavailableResult.to_s
 
-  if unavailableResult[0] == "UnimplementedMethod"
+  if unavailableResult[0] == "unimplementedMethod"
     conflictCauses = unavailableResult[1]
     ocurrences = unavailableResult[2]
 
     bcUnimplementedMethod = BCUnimplementedMethod.new(gumTree, projectName, projectPath, commitHash,
       conflictParents, conflictCauses)
     bcUnSymbolResult = bcUnimplementedMethod.getGumTreeAnalysis()
-    puts "bcUNres = \n#{bcUnSymbolResult}\n"
-    if bcUnSymbolResult[0] != ""
+
       baseCommit = bcUnSymbolResult[1]
       cause = bcUnSymbolResult[0]
       className = conflictCauses[0][0]
@@ -92,7 +91,7 @@ if true
         puts methodNameByTravis
 
         if resp != "n" && resp != "N"
-          fixer = FixUnimplementedMethod.new(projectName, projectPath, baseCommit, fileToChange, cause, conflictLine)
+          fixer = FixUnimplementedMethod.new(projectName, projectPath, baseCommit, fileToChange, cause, conflictLine, methodNameByTravis)
           fixer.fix(className)
         end
       end
@@ -114,10 +113,9 @@ if true
       puts ">>>>>>>>>>>>>>>base"
       puts baseCommit
     end
-  end
 
   #TODO: METODO
-  if unavailableResult[0] == "UnimplementedMethodMethod"
+  if unavailableResult[0] == "UnimplementedMethod"
     conflictCauses = unavailableResult[1]
     ocurrences = unavailableResult[2]
 

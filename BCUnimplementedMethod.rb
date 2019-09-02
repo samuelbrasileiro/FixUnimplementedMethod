@@ -60,15 +60,15 @@ class BCUnimplementedMethod
   end
 
   def gumTreeDiffByBranch(result, left, right, base, pathProject, cloneProject)
-    baseLeft = runAllDiff(base, left)
-    baseRight = runAllDiff(base, right)
-    leftResult = runAllDiff(left, result)
-    rightResult = runAllDiff(right, result)
+    baseLeft = runAllDiff(base, left, 1)
+    baseRight = runAllDiff(base, right, 2)
+    leftResult = runAllDiff(left, result, 3)
+    rightResult = runAllDiff(right, result, 3)
     
-    return verifyBuildConflict(baseLeft, leftResult, baseRight, rightResult, result, left, right, base)
+    return verifyBuildConflict(baseLeft, leftResult, baseRight, rightResult, getConflictCauses()[0])
   end
 
-  def runAllDiff(firstBranch, secondBranch)
+  def runAllDiff(firstBranch, secondBranch,processNumber)
     Dir.chdir getGumTreePath()
     mainDiff = nil
     modifiedFilesDiff = []
@@ -78,7 +78,7 @@ class BCUnimplementedMethod
     begin
       kill = %x(pkill -f gumtree)
       sleep(10)
-      print "aqui1"
+      puts "Started Gumtree Process #{processNumber}"
       thr = Thread.new { diff = system "bash", "-c", "exec -a gumtree ./gumtree webdiff #{firstBranch.gsub("\n","")} #{secondBranch.gsub("\n","")}" }
       sleep(15)
       mainDiff = %x(wget http://127.0.0.1:4567/ -q -O -)
@@ -86,11 +86,11 @@ class BCUnimplementedMethod
       addedFiles = getDiffByAddedFile(mainDiff[/Added files <span class="badge">(.*?)<\/span>/m, 1])
       deletedFiles = getDiffByDeletedFile(mainDiff[/Deleted files <span class="badge">(.*?)<\/span>/m, 1])
 
-      print "aqui2"
+      puts "Ended Gumtree Process #{processNumber}"
 
       kill = %x(pkill -f gumtree)
       sleep(5)
-    rescue Exception => e
+    rescue StandardError => e
       puts e
       puts "GumTree Failed"
     end
@@ -106,7 +106,7 @@ class BCUnimplementedMethod
         file = gumTreePage.css('div.col-lg-12 h3 small').text[/(.*?) \-\>/m, 1].gsub(".java", "")
         script = gumTreePage.css('div.col-lg-12 pre').text
         result[file.to_s] = script.gsub('"', "\"")
-      rescue Exception => e
+      rescue StandardError => e
         print e
       end
 
