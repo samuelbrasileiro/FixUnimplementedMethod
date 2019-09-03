@@ -64,110 +64,35 @@ if true
   if unavailableResult[0] == "unimplementedMethod"
     conflictCauses = unavailableResult[1]
     ocurrences = unavailableResult[2]
-
+    filePath = unavailableResult[3]
+    interfacePath = unavailableResult[4]
+    puts filePath
+    puts interfacePath
     bcUnimplementedMethod = BCUnimplementedMethod.new(gumTree, projectName, projectPath, commitHash,
       conflictParents, conflictCauses)
-    bcUnSymbolResult = bcUnimplementedMethod.getGumTreeAnalysis()
+    #bcUnSymbolResult = bcUnimplementedMethod.getGumTreeAnalysis()
+    #baseCommit = bcUnSymbolResult[1]
+    className = conflictCauses[0][1]
+    interfaceName = conflictCauses[0][2]
+    methodNameByTravis = conflictCauses[0][3]
 
-      baseCommit = bcUnSymbolResult[1]
-      cause = bcUnSymbolResult[0]
-      className = conflictCauses[0][0]
-      callClassName = conflictCauses[0][2]
-      methodNameByTravis = conflictCauses[0][1]
-      conflictFile = conflictCauses[0][3].tr(":","")
-      fileToChange = conflictFile.gsub(/\/home\/travis\/build\/[a-z|A-Z|0-9]+\/[a-z|A-Z|0-9]+\//,"")
-      conflictLine = Integer(conflictCauses[0][4].gsub("[","").gsub("]","").split(",")[0])
+    puts "A build Conflict was detect, the conflict type is " + unavailableResult[0] + "."
+    puts "Do you want fix it? Y or n"
+    resp = STDIN.gets()
+    # resp = "n"
 
+    puts ">>>>>>>>>>>>>>>Interface to change"
+    puts interfacePath
+    puts ">>>>>>>>>>>>>>>Conflict Called File"
+    puts interfaceName
+    puts ">>>>>>>>>>>>>>>Unimplemented Method"
+    puts methodNameByTravis
+    puts ">>>>>>>>>>>>>>>Class"
+    puts className
 
-      if className == callClassName
-        puts "A build Conflict was detect, the conflict type is " + unavailableResult[0] + "."
-        puts "Do you want fix it? Y or n"
-        resp = STDIN.gets()
-        # resp = "n"
-
-        puts ">>>>>>>>>>>>>>>class"
-        puts className
-        puts ">>>>>>>>>>>>>>>method"
-        puts methodNameByTravis
-
-        if resp != "n" && resp != "N"
-          fixer = FixUnimplementedMethod.new(projectName, projectPath, baseCommit, fileToChange, cause, conflictLine, methodNameByTravis)
-          fixer.fix(className)
-        end
-      end
-
-
-      # TODO: get back deleted files
-      puts ">>>>>>>>>>>>>>>missing symbol"
-      puts cause
-      puts ">>>>>>>>>>>>>>>file "
-      puts conflictFile
-      puts ">>>>>>>>>>>>>>>fileToChange "
-      puts fileToChange
-      puts ">>>>>>>>>>>>>>>class"
-      puts className
-      puts ">>>>>>>>>>>>>>>method"
-      puts methodName
-      puts ">>>>>>>>>>>>>>>line"
-      puts conflictLine
-      puts ">>>>>>>>>>>>>>>base"
-      puts baseCommit
-    end
-
-  #TODO: METODO
-  if unavailableResult[0] == "UnimplementedMethod"
-    conflictCauses = unavailableResult[1]
-    ocurrences = unavailableResult[2]
-
-    bcUnimplementedMethod = BCUnimplementedMethod.new(gumTree, projectName, projectPath, commitHash, conflictParents, conflictCauses)
-    bcUnSymbolResult = bcUnimplementedMethod.getGumTreeAnalysis()
-
-    #print("\nbcUnSymbolResult = \n#{bcUnSymbolResult}\n")
-    
-    if bcUnSymbolResult[0] != ""
-      baseCommit = bcUnSymbolResult[1]
-      cause = bcUnSymbolResult[0][0]
-      substituter = bcUnSymbolResult[0][1]#metodo identificado pelo log da gumtree
-      className = conflictCauses[0][0]
-      callClassName = conflictCauses[0][2]
-      methodNameByTravis = conflictCauses[0][1]#travis
-      conflictFile = conflictCauses[0][3].tr(":","")
-      fileToChange = conflictFile.gsub(/\/home\/travis\/build\/[^\/]+\/[^\/]+\//, "")
-      conflictLine = Integer(conflictCauses[0][4].gsub("[","").gsub("]","").split(",")[0])
-
-      print "class name / callclassname #{className}/ #{callClassName}\n\n\n"
-      if cause == methodNameByTravis
-        puts "A build Conflict was detect, the conflict type is " + unavailableResult[0] + "."
-        puts "Do you want fix it? Y or n"
-        resp = STDIN.gets()
-        # resp = "n"
-
-        puts ">>>>>>>>>>>>>>>class"
-        puts className
-        puts ">>>>>>>>>>>>>>>method"
-        puts methodNameByTravis
-        puts ">>>>>>>>>>>>>>>substituter"
-        puts substituter
-        if resp != "n" && resp != "N"
-          fixer = FixUnimplementedMethod.new(projectName, projectPath, baseCommit, fileToChange, cause, conflictLine, substituter)
-          fixer.fixMethod
-        end
-      end
-
-      puts ">>>>>>>>>>>>>>>missing symbol"
-      puts cause
-      puts ">>>>>>>>>>>>>>>file "
-      puts conflictFile
-      puts ">>>>>>>>>>>>>>>fileToChange "
-      puts fileToChange
-      puts ">>>>>>>>>>>>>>>class"
-      puts className
-      puts ">>>>>>>>>>>>>>>method"
-      puts methodNameByTravis
-      puts ">>>>>>>>>>>>>>>line"
-      puts conflictLine
-      puts ">>>>>>>>>>>>>>>base"
-      puts baseCommit
+    if resp != "n" && resp != "N"
+      fixer = FixUnimplementedMethod.new(projectName, projectPath, fileToChange, methodNameByTravis)
+      fixer.fix(className)
     end
   end
 end
