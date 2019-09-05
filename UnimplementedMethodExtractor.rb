@@ -39,6 +39,7 @@ class UnimplementedMethodExtractor
     interfaceFiles = buildLog.to_enum(:scan, /#{stringNoOverride} [0-9a-zA-Z\(\)\<\>\.\,]* in [a-zA-Z\.]*[^\n]+/).map { Regexp.last_match }
     methodInterfaces = buildLog.to_enum(:scan, /#{stringNoOverride} [0-9a-zA-Z\(\)\.\,\<\>]* in/).map { Regexp.last_match }
     count = 0
+    puts methodInterfaces[count].to_s
     while(count < interfaceFiles.size)
       classFile = ""
       methodInterface = ""
@@ -60,11 +61,12 @@ class UnimplementedMethodExtractor
       end
       interfaceFile = interfaceFiles[count].to_s.split(".").last.gsub("\r", "").to_s
       if (methodInterfaces[count].to_s.match(/does not override abstract method[\s\S]*\(/))
+
         puts "aqui 3"
         # does not override abstract method getValueTypeDesc() in com.fasterxml.jackson.databind.deser.ValueInstantiator
 				unimpFilePath = buildLog.match(/does not override abstract method[\s\S]*\([\s\S]*\) in [\s\S]* /).to_s
-				unimpFilePath.gsub!(/does not override abstract method[\s\S]*\([\s\S]*\) in *\[/, "")
-				unimpFilePath.gsub!(/\[ERROR\][\s\S]*/, "")
+				unimpFilePath.gsub!(/does not override abstract method[\s\S]*\([\s\S]*\) in /, "")
+				unimpFilePath.gsub!(/(\r|\n|\[)[\s\S]*/, "")
 				array = unimpFilePath.split(".")
 				unimpFilePath = array.join("/")
         methodInterface = methodInterfaces[count].to_s.match(/does not override abstract method[\s\S]*\(/).to_s.gsub(/does not override abstract method /,"").to_s.gsub("\(","")

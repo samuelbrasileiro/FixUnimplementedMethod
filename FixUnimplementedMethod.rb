@@ -1,9 +1,8 @@
 class FixUnimplementedMethod
 
-  def initialize(projectName, projectPath, filePath, unimplementedMethod)
+  def initialize(projectPath, filePath, unimplementedMethod)
     @projectPath = projectPath
     @filePath = filePath
-    @projectName = projectName
     @unimplementedMethod = unimplementedMethod
     @initialPath = ""
   end
@@ -14,23 +13,36 @@ class FixUnimplementedMethod
   end
 
 
-  def fix()
-    return
+  def fix(abstractName)
+    realPath = %x(find . -name "#{abstractName}")
+    realPath.sub!(/^\./,"")
+    realPath.gsub!(/\n/,"")
+    if realPath.match(/#{@filePath}/)
+      fileDirectory = Dir.getwd + realPath
+      baseFileContent = File.read(fileDirectory)
+      array = baseFileContent.split("\n")
 
-    fileDirectory = Dir.getwd + "/" + @filePath
-    puts fileDirectory
-    #armazenar o conteudo do arquivo que esta faltando o metodo
-    baseFileContent = File.read(fileDirectory)
-    puts baseFileContent
-  puts "missing = " + @missingMethod
-    puts "declared = "+ @declaredMethod
-    #substituir o metodo que mudou o nome para o que foi declarado
-    baseFileContent.gsub!(@missingMethod, @declaredMethod)
+      array.each do |line|
+        if line.match(/abstract [A-Za-z0-9\_\-]* #{@unimplementedMethod}\(\)/)
+          line.sub!(/abstract /, "")
+          if line.match(/String/)
+            line.sub!(/;/, "{return \"\";};")
+          elsif line.match(/(Int|Double|Float)/)
+            line.sub!(/;/, "{return 0;};")
+          elsif line.match(/Boolean/)
+            line.sub!(/;/, "{return false;};")
+          else
 
-    #escrever no arquivo
-    e = File.open(fileDirectory, 'w')
-    e.write(baseFileContent)
-    e.close
+            line.sub!(/;/, "{return null;};")
+          end
+        end
+      end
+      baseFileContent = array.join("\n")
+      e = File.open(fileDirectory, 'w')
+      e.write(baseFileContent)
+      e.close
+    end
+
   end
 
 

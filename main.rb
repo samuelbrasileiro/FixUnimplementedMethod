@@ -64,16 +64,14 @@ if true
   if unavailableResult[0] == "unimplementedMethod"
     conflictCauses = unavailableResult[1]
     ocurrences = unavailableResult[2]
-    filePath = unavailableResult[3]
-    interfacePath = unavailableResult[4]
-    puts filePath
-    puts interfacePath
+    interfacePath = unavailableResult[3] + ".java"
+
     bcUnimplementedMethod = BCUnimplementedMethod.new(gumTree, projectName, projectPath, commitHash,
       conflictParents, conflictCauses)
     #bcUnSymbolResult = bcUnimplementedMethod.getGumTreeAnalysis()
     #baseCommit = bcUnSymbolResult[1]
     className = conflictCauses[0][1]
-    interfaceName = conflictCauses[0][2]
+    interfaceName = conflictCauses[0][2] + ".java"
     methodNameByTravis = conflictCauses[0][3]
 
     puts "A build Conflict was detect, the conflict type is " + unavailableResult[0] + "."
@@ -90,9 +88,9 @@ if true
     puts ">>>>>>>>>>>>>>>Class"
     puts className
 
-    if resp != "n" && resp != "N"
-      fixer = FixUnimplementedMethod.new(projectName, projectPath, fileToChange, methodNameByTravis)
-      fixer.fix(className)
+    if !resp.match(/(n|N)/)
+      fixer = FixUnimplementedMethod.new( projectPath, interfacePath, methodNameByTravis)
+      fixer.fix(interfaceName)
     end
   end
 end
